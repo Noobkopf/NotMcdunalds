@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>NotMcDunalds Mitarbeiter</title>
+
+<link rel="icon" type="image/png" href="NotMcdunalds.png">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>👨‍🍳 NotMcDunalds Mitarbeiterbereich</h1>
+
+<a href="index.html">
+🍔 Kunde
+</a>
+
+</header>
+
+
+
+
+
+<div id="login">
+
+<h2>🔐 Mitarbeiter Login</h2>
+
+
+<input 
+id="password"
+type="password"
+placeholder="Passwort">
+
+
+<button onclick="login()">
+
+Login
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div id="panel" style="display:none">
+
+
+<h2>📋 Bestellungen</h2>
+
+
+<div id="orders">
+
+</div>
+
+
+
+<audio id="newOrderSound" src="neworder.mp3"></audio>
+
+
+
+
+<hr>
+
+
+
+
+<h2>🔒 Restaurant Steuerung</h2>
+
+
+<div class="box">
+
+
+<p id="shopStatus">
+
+⏳ Status wird geladen...
+
+</p>
+
+
+
+<button onclick="toggleShop()">
+
+🔒 Öffnen / Schließen
+
+</button>
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+let lastOrders = 0;
+
+
+
+
+
+function login(){
+
+
+let password=document.getElementById("password").value;
+
+
+
+if(password==="1234"){
+
+
+document.getElementById("login").style.display="none";
+
+
+document.getElementById("panel").style.display="block";
+
+
+loadOrders();
+
+checkShopStatus();
+
+
+
+setInterval(loadOrders,5000);
+
+
+setInterval(checkShopStatus,5000);
+
+
+}
+
+else{
+
+
+alert("❌ Falsches Passwort");
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+function loadOrders(){
+
+
+fetch("/orders")
+
+
+.then(res=>res.json())
+
+
+.then(data=>{
+
+
+
+// 🔔 Neue Bestellung erkennen
+
+if(data.length > lastOrders){
+
+
+if(lastOrders !== 0){
+
+
+let sound=document.getElementById("newOrderSound");
+
+
+sound.play();
+
+
+alert("🔔 New Order");
+
+
+}
+
+
+}
+
+
+
+lastOrders=data.length;
+
+
+
+
+
+
+
+let html="";
+
+
+
+if(data.length===0){
+
+
+html="<h3>Keine Bestellungen vorhanden</h3>";
+
+
+}
+
+
+
+
+data.slice().reverse().forEach(order=>{
+
+
+
+html+=`
+
+
+<div class="box">
+
+
+<h2>🍔 Bestellung #${order.number}</h2>
+
+
+<b>📍 Quelle:</b> ${order.location}
+
+
+<br>
+
+
+<b>🥡 Ausgabe:</b> ${order.type}
+
+
+<hr>
+
+
+
+${order.items.map(item=>"• "+item).join("<br>")}
+
+
+
+<br><br>
+
+
+
+<b>⏱ Zeit:</b> ${order.time}
+
+
+
+<br>
+
+
+
+<b>📌 Status:</b> ${order.status}
+
+
+
+<br><br>
+
+
+
+<button onclick="finishOrder(${order.id})">
+
+✅ Fertig
+
+</button>
+
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+document.getElementById("orders").innerHTML=html;
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+
+
+function finishOrder(id){
+
+
+fetch("/delete",{
+
+
+method:"POST",
+
+
+headers:{
+
+
+"Content-Type":"application/json"
+
+
+},
+
+
+body:JSON.stringify({
+
+
+id:id
+
+
+})
+
+
+})
+
+
+.then(()=>loadOrders());
+
+
+}
+
+
+
+
+
+
+
+
+
+function checkShopStatus(){
+
+
+
+fetch("/shop-status")
+
+
+.then(res=>res.json())
+
+
+.then(data=>{
+
+
+let status=document.getElementById("shopStatus");
+
+
+
+if(data.open){
+
+
+status.innerHTML="🟢 NotMcDunalds ist geöffnet";
+
+
+}
+
+
+else{
+
+
+status.innerHTML="🔴 NotMcDunalds ist geschlossen";
+
+
+}
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+
+
+function toggleShop(){
+
+
+let password=prompt("🔐 Admin Passwort:");
+
+
+
+fetch("/toggle-shop",{
+
+
+method:"POST",
+
+
+headers:{
+
+
+"Content-Type":"application/json"
+
+
+},
+
+
+body:JSON.stringify({
+
+
+password:password
+
+
+})
+
+
+})
+
+
+.then(res=>res.json())
+
+
+.then(data=>{
+
+
+if(data.error){
+
+
+alert("❌ "+data.error);
+
+
+return;
+
+
+}
+
+
+
+checkShopStatus();
+
+
+
+alert(
+
+data.open ?
+
+"🟢 Restaurant geöffnet" :
+
+"🔴 Restaurant geschlossen"
+
+);
+
+
+});
+
+
+}
+
+
+
+</script>
+
+
+
+
+
+</body>
+
+</html>
