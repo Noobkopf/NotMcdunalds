@@ -314,7 +314,7 @@ app.post("/toggle-shop", (req, res) => {
 // Server starten
 // =====================
 
-const PORT = 13459;
+const PORT = process.env.PORT || 13459;
 
 
 app.listen(PORT, "0.0.0.0", () => {
