@@ -7,7 +7,7 @@
 
 <title>NotMcDunalds Restaurant</title>
 
-<link rel="icon" type="image/png" href="NotMcdunalds.png">
+<link rel="icon" type="image/png" href="/NotMcdunalds.png">
 
 <link rel="stylesheet" href="style.css">
 
@@ -61,7 +61,6 @@ Wähle deine Bestellung aus und genieße dein Essen im Restaurant oder nimm es m
 
 
 
-
 <h2>🍔 Burger</h2>
 
 
@@ -69,65 +68,112 @@ Wähle deine Bestellung aus und genieße dein Essen im Restaurant oder nimm es m
 
 
 <button onclick="addItem('Hamburger - 1 E')">
+
 🍔 Hamburger
+
 <br>
+
 1 E
+
 </button>
 
 
-<button onclick="addItem('Hamburger Menü - 3 E')">
+
+<button onclick="openMenu('Hamburger Menü','3 E')">
+
 🍔 Hamburger Menü
+
 <br>
+
 3 E
+
 </button>
+
 
 
 
 <button onclick="addItem('Cheeseburger - 2 E')">
+
 🧀 Cheeseburger
+
 <br>
+
 2 E
+
 </button>
 
 
-<button onclick="addItem('Cheeseburger Menü - 4 E')">
+
+
+<button onclick="openMenu('Cheeseburger Menü','4 E')">
+
 🧀 Cheeseburger Menü
+
 <br>
+
 4 E
+
 </button>
+
+
 
 
 
 <button onclick="addItem('Big NM - 6 E')">
+
 🍔 Big NM
+
 <br>
+
 6 E
+
 </button>
 
 
-<button onclick="addItem('Big NM Menü - 8 E')">
+
+
+
+<button onclick="openMenu('Big NM Menü','8 E')">
+
 🍔 Big NM Menü
+
 <br>
+
 8 E
+
 </button>
+
+
 
 
 
 <button onclick="addItem('A Tasty Bacon - 5 E')">
+
 🥓 A Tasty Bacon
+
 <br>
+
 5 E
+
 </button>
 
 
-<button onclick="addItem('A Tasty Bacon Menü - 7 E')">
+
+
+
+<button onclick="openMenu('A Tasty Bacon Menü','7 E')">
+
 🥓 A Tasty Bacon Menü
+
 <br>
+
 7 E
+
 </button>
 
 
 </div>
+
 
 
 
@@ -238,6 +284,7 @@ Wähle deine Bestellung aus und genieße dein Essen im Restaurant oder nimm es m
 
 
 
+
 <button onclick="addItem('NM Ice Cream Sweet - 2 E')">
 
 🍬 Sweet
@@ -247,6 +294,7 @@ Wähle deine Bestellung aus und genieße dein Essen im Restaurant oder nimm es m
 2 E
 
 </button>
+
 
 
 
@@ -262,6 +310,7 @@ Wähle deine Bestellung aus und genieße dein Essen im Restaurant oder nimm es m
 
 
 
+
 <button onclick="addItem('NM Ice Cream Fruit - 2 E')">
 
 🍓 Fruit
@@ -271,6 +320,75 @@ Wähle deine Bestellung aus und genieße dein Essen im Restaurant oder nimm es m
 2 E
 
 </button>
+
+
+</div>
+
+
+
+
+
+
+<!-- Menü Auswahl Fenster -->
+
+
+<div id="menuPopup" class="box" style="display:none;">
+
+
+<h2>🍔 Menü zusammenstellen</h2>
+
+
+<p id="menuTitle"></p>
+
+
+
+<h3>🥤 Getränk auswählen</h3>
+
+
+<select id="drinkChoice">
+
+<option>Cola Soda</option>
+
+<option>Orange Soda</option>
+
+<option>Creaming Soda</option>
+
+<option>Iced Tea</option>
+
+</select>
+
+
+
+
+<h3>🍟 Snack auswählen</h3>
+
+
+<select id="snackChoice">
+
+<option>French Fries</option>
+
+</select>
+
+
+
+<br><br>
+
+
+
+<button onclick="confirmMenu()">
+
+✅ Menü hinzufügen
+
+</button>
+
+
+
+<button onclick="closeMenu()">
+
+❌ Abbrechen
+
+</button>
+
 
 
 </div>
@@ -315,6 +433,7 @@ Noch leer
 
 
 
+
 <div class="box">
 
 <p id="type">
@@ -324,9 +443,6 @@ Keine Auswahl
 </p>
 
 </div>
-
-
-
 
 
 
@@ -342,14 +458,7 @@ Keine Auswahl
 
 
 
-
-
 <h2 id="result"></h2>
-
-
-
-
-
 
 
 <script>
@@ -358,6 +467,12 @@ Keine Auswahl
 let items = [];
 
 let type = "";
+
+
+let selectedMenu = "";
+
+let selectedMenuPrice = "";
+
 
 
 
@@ -373,21 +488,26 @@ updateCart();
 
 
 
+
 function updateCart(){
 
-let cart=document.getElementById("cart");
+
+let cart = document.getElementById("cart");
 
 
-if(items.length===0){
 
-cart.innerHTML="Noch leer";
+if(items.length === 0){
+
+cart.innerHTML = "Noch leer";
 
 return;
 
 }
 
 
-cart.innerHTML="";
+
+cart.innerHTML = "";
+
 
 
 items.forEach((item,index)=>{
@@ -395,7 +515,7 @@ items.forEach((item,index)=>{
 
 cart.innerHTML +=
 
-"• "+item+
+"• " + item +
 
 " <button onclick='removeItem("+index+")'>❌</button><br>";
 
@@ -421,13 +541,110 @@ updateCart();
 
 
 
+
+
+// =====================
+// Menü Auswahl
+// =====================
+
+
+function openMenu(menu,price){
+
+
+selectedMenu = menu;
+
+selectedMenuPrice = price;
+
+
+document.getElementById("menuTitle").innerHTML =
+
+"🍔 " + menu;
+
+
+
+document.getElementById("menuPopup").style.display="block";
+
+
+}
+
+
+
+
+
+function closeMenu(){
+
+
+document.getElementById("menuPopup").style.display="none";
+
+
+}
+
+
+
+
+
+function confirmMenu(){
+
+
+let drink =
+
+document.getElementById("drinkChoice").value;
+
+
+
+let snack =
+
+document.getElementById("snackChoice").value;
+
+
+
+addItem(
+
+selectedMenu +
+
+" - " +
+
+selectedMenuPrice +
+
+" + 🍟 " +
+
+snack +
+
+" + 🥤 " +
+
+drink
+
+);
+
+
+
+closeMenu();
+
+
+}
+
+
+
+
+
+
+
+
+
 function setType(value){
 
-type=value;
+
+type = value;
+
 
 document.getElementById("type").innerHTML=value;
 
+
 }
+
+
+
+
 
 
 
@@ -436,77 +653,123 @@ document.getElementById("type").innerHTML=value;
 function sendOrder(){
 
 
+
 if(items.length===0){
+
 
 alert("Bitte erst etwas auswählen!");
 
 return;
 
+
 }
+
+
 
 
 
 if(type===""){
 
+
 alert("Bitte Ausgabe auswählen!");
 
 return;
 
+
 }
+
+
+
 
 
 
 fetch("/order",{
 
+
 method:"POST",
+
 
 headers:{
 
+
 "Content-Type":"application/json"
+
 
 },
 
+
+
 body:JSON.stringify({
+
 
 items:items,
 
+
 type:type,
+
 
 location:"Terminal"
 
+
 })
 
 
 })
+
 
 
 .then(res=>res.json())
 
 
+
 .then(data=>{
+
+
+
+if(data.error){
+
+
+alert(data.error);
+
+return;
+
+
+}
+
 
 
 document.getElementById("result").innerHTML=
 
+
 "🎉 Bestellung erfolgreich!<br><br>"+
+
 
 "Deine Bestellnummer: <b>#"+
 
+
 data.order.number+
+
 
 "</b>";
 
 
 
+
+
 items=[];
 
+
 updateCart();
+
 
 
 });
 
 
+
 }
+
+
 
 
 
@@ -517,13 +780,17 @@ updateCart();
 function checkShopStatus(){
 
 
+
 fetch("/shop-status")
+
 
 
 .then(res=>res.json())
 
 
+
 .then(data=>{
+
 
 
 let status=document.getElementById("shopStatus");
@@ -532,46 +799,58 @@ let button=document.getElementById("orderButton");
 
 
 
+
 if(data.open){
 
 
 status.innerHTML="🟢 NotMcDunalds ist geöffnet";
 
+
 button.disabled=false;
 
 
+
 }
+
+
 
 else{
 
 
 status.innerHTML="🔴 NotMcDunalds ist geschlossen";
 
+
 button.disabled=true;
 
 
+
 }
+
 
 
 
 });
 
 
+
 }
+
+
+
 
 
 
 checkShopStatus();
 
+
 setInterval(checkShopStatus,5000);
+
 
 
 
 </script>
 
 
-
 </body>
 
 </html>
-```
